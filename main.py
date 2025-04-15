@@ -97,6 +97,7 @@ def logout():
 
 # App flow
 def main_app():
+    st.set_page_config("Secure Data Encryption", "🔐")
     st.title("🛡️ Secure Data Encryption")
 
     menu = ["Store Data", "Retrieve Data", "Logout"]
