@@ -1,4 +1,7 @@
-import streamlit as st
+import streamlit as st    
+
+st.set_page_config("Secure Data Encryption", "🔐")
+
 from cryptography.fernet import Fernet, InvalidToken
 import hashlib
 import os
@@ -97,7 +100,6 @@ def logout():
 
 # App flow
 def main_app():
-    st.set_page_config("Secure Data Encryption", "🔐")
     st.title("🛡️ Secure Data Encryption")
 
     menu = ["Store Data", "Retrieve Data", "Logout"]
@@ -138,4 +140,3 @@ elif page == "App":
         main_app()
     else:
         st.warning("🔐 Please log in to access the app.")
-
