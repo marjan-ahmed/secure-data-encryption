@@ -61,7 +61,7 @@ def login():
             if st.session_state.users[username] == hash_text(password):
                 st.session_state.is_logged_in = True
                 st.session_state.username = username
-                st.success(f"✅ Welcome, {username}!")
+                st.success(f"✅ User successfully Loged In")
             else:
                 st.error("❌ Incorrect password.")
         else:
@@ -102,11 +102,39 @@ def logout():
 def main_app():
     st.title("🛡️ Secure Data Encryption")
 
-    menu = ["Store Data", "Retrieve Data", "Logout"]
-    choice = st.sidebar.radio("Navigation", menu)
+    # Welcome in sidebar
+    st.sidebar.markdown(f"### 👋 Welcome, `{st.session_state.username}`")
 
-    if choice == "Store Data":
-        st.header("📥 Store Encrypted Data")
+    # Page Navigation state
+    if "menu_page" not in st.session_state:
+        st.session_state.menu_page = "Home"
+
+    # Sidebar menu
+    menu = ["Home", "Store Data", "Retrieve Data", "View Stored Data", "Logout"]
+    choice = st.sidebar.radio("Navigation", menu, index=menu.index(st.session_state.menu_page))
+
+    # Handle main page display based on selected choice
+    if choice == "Home":
+        st.subheader("🏠 Dashboard")
+        st.markdown("Choose an option below:")
+
+        col1, col2, col3 = st.columns(3)
+
+        with col1:
+            if st.button("📥 Store Data"):
+                st.session_state.menu_page = "Store Data"
+                st.experimental_rerun()
+        with col2:
+            if st.button("📤 Retrieve Data"):
+                st.session_state.menu_page = "Retrieve Data"
+                st.experimental_rerun()
+        with col3:
+            if st.button("📚 View Stored Data"):
+                st.session_state.menu_page = "View Stored Data"
+                st.experimental_rerun()
+
+    elif choice == "Store Data":
+        st.subheader("📥 Store Encrypted Data")
         text = st.text_area("Enter data to encrypt")
         passkey = st.text_input("Passkey", type="password")
         if st.button("Encrypt & Save"):
@@ -116,7 +144,7 @@ def main_app():
                 st.code(result, language="text")
 
     elif choice == "Retrieve Data":
-        st.header("📤 Retrieve Encrypted Data")
+        st.subheader("📤 Retrieve Encrypted Data")
         encrypted_text = st.text_area("Enter encrypted text")
         passkey = st.text_input("Passkey", type="password")
         if st.button("Decrypt"):
@@ -125,18 +153,16 @@ def main_app():
                 st.info("Decryption Result:")
                 st.write(result)
 
+    elif choice == "View Stored Data":
+        st.subheader("📚 View Stored Data")
+        count = 0
+        for encrypted, meta in st.session_state.stored_data.items():
+            if meta["owner"] == st.session_state.username:
+                with st.expander(f"🔐 Encrypted Entry #{count + 1}"):
+                    st.code(encrypted, language="text")
+                count += 1
+        if count == 0:
+            st.info("No encrypted data found for this user.")
+
     elif choice == "Logout":
         logout()
-
-# Page selector
-page = st.sidebar.selectbox("Choose Page", ["Login", "Register", "App"])
-
-if page == "Register":
-    register()
-elif page == "Login":
-    login()
-elif page == "App":
-    if st.session_state.is_logged_in:
-        main_app()
-    else:
-        st.warning("🔐 Please log in to access the app.")
